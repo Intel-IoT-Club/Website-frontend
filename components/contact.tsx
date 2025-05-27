@@ -53,7 +53,7 @@ export default function Contact() {
       process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY as string
     )
       .then(() => {
-        toast("✅ Message sent successfully!")
+        toast("✅ Message sent successfully! Will try to reach to you shortly!")
         setFormData({ name: "", email: "", subject: "", message: "" })
       })
       .catch((error) => {
