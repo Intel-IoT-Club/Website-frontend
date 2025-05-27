@@ -20,7 +20,7 @@ import {
   Phone,
 } from "lucide-react"
 import Link from "next/link"
-import emailjs from "emailjs-com"
+import emailjs from '@emailjs/browser';
 import { toast } from "sonner"
 export default function Contact() {
   const [formData, setFormData] = useState({
