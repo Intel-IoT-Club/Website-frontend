@@ -1,56 +1,74 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
+import { CalendarDays, MapPin, CheckCircle } from "lucide-react"
 
 export default function HackathonPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
-      <section className="w-full max-w-5xl mx-auto p-6 bg-card rounded-2xl shadow-md border">
-        {/* Hackathon Name */}
-        <div className="flex justify-center mb-4">
-          <div className="px-4 py-1 rounded-lg text-5xl font-extrabold bg-background/80">
+    <main className="flex min-h-screen items-center justify-center bg-[#0e0e0e] text-white px-4 py-10">
+      <section className="w-full max-w-5xl bg-[#1a1a1a] border border-[#2c2c2c] rounded-3xl shadow-2xl p-8 space-y-8">
+
+        <div className="text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-100">
             InnovateX Hackathon 2025
-          </div>
+          </h1>
+          <p className="text-gray-400 mt-2 text-lg">
+            Code with purpose. Build with impact.
+          </p>
         </div>
-        {/* Top: Banner + Info */}
-        <div className="flex flex-col md:flex-row gap-6 mb-4">
-          {/* Banner/Pic */}
-          <div className="flex-1 flex items-center justify-center">
-            <div className="w-full h-56 md:h-72 bg-muted rounded-xl flex items-center justify-center overflow-hidden">
-              <Image
-                src="/hackathon.png"
-                alt="Hackathon banner"
-                width={960}
-                height={540}
-                className="object-cover w-full h-full rounded-xl"
-                priority
-              />
-            </div>
+
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex-1 h-64 md:h-80 overflow-hidden rounded-xl border border-[#2c2c2c]">
+            <Image
+              src="/hackathon.png"
+              alt="Hackathon Banner"
+              width={1200}
+              height={800}
+              className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500"
+              priority
+            />
           </div>
-          {/* Date, Location, Status */}
-          <div className="flex flex-col gap-3 md:w-64">
-            <div className="px-4 py-2 rounded-md bg-background/80 text-base">Date: 2024-08-15</div>
-            <div className="px-4 py-2 rounded-md bg-background/80 text-base">Location: Main Auditorium</div>
-            <div className="px-4 py-2 rounded-md bg-background/80 text-base">Status: <span className="font-semibold">Open</span></div>
-            <Link href="/hackathon/register" className="mt-2 w-full block">
-              <button className="w-full py-2 px-4 bg-primary text-primary-foreground font-semibold rounded-md hover:bg-primary/90 transition">
+
+          <div className="flex flex-col gap-3 md:w-1/3">
+            <div className="bg-[#111111] border border-[#2c2c2c] rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 text-gray-300">
+                <CalendarDays className="w-5 h-5 text-gray-400" />
+                <span>Date: August 15, 2024</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-300">
+                <MapPin className="w-5 h-5 text-gray-400" />
+                <span>Location: Main Auditorium</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-300">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>
+                  Status: <strong className="text-green-500">Open</strong>
+                </span>
+              </div>
+            </div>
+            <Link href="/hackathon/register">
+              <button className="w-full mt-2 py-3 bg-[#2c2c2c] text-white rounded-xl font-semibold hover:bg-[#3c3c3c] transition duration-300 shadow-md">
                 Register Now
               </button>
             </Link>
           </div>
         </div>
-        {/* Tagline/One-liner */}
-        <div className="mb-4">
-          <div className="w-full px-4 py-2 rounded-md bg-background/80 text-2xl font-semibold">
-            Code, Create & Contribute!
-          </div>
+
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-gray-300">
+            Code. Create. Contribute.
+          </h2>
         </div>
-        {/* Description */}
-        <div>
-          <div className="w-full min-h-[120px] px-4 py-6 rounded-xl bg-background/80 text-lg">
-            Hackathon Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque. More details about the hackathon, rules, schedule, and registration info can go here.
-          </div>
+
+        <div className="bg-[#111111] border border-[#2c2c2c] rounded-2xl p-6 text-gray-300 text-lg leading-relaxed">
+          <p>
+            InnovateX Hackathon 2025 is a 24-hour tech sprint where innovation meets collaboration. Whether you're a coder, designer, or entrepreneur, this is your space to shine. Solve real-world problems, meet industry experts, and push your limits.
+          </p>
+          <br />
+          <p>
+            Expect hands-on mentoring, team building, fun events, and the chance to win amazing prizes. Come with ideas, leave with experience.
+          </p>
         </div>
       </section>
     </main>
-  );
+  )
 }
