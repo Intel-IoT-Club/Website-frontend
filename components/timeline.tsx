@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, useAnimation } from 'framer-motion';
+import { motion, useAnimation, useInView } from 'framer-motion';
 
 const timelineData = [
   {
@@ -151,27 +151,21 @@ const timelineData = [
   },
 ]
 
-function useInViewAnimation(ref) {
+function useInViewAnimation(ref: React.RefObject<HTMLDivElement | null>) {
   const controls = useAnimation();
+  const isInView = useInView(ref, { amount: 0.3 });
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          controls.start('visible');
-        } else {
-          controls.start('hidden');
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (ref.current) observer.observe(ref.current);
-    return () => ref.current && observer.unobserve(ref.current);
-  }, [ref, controls]);
+    if (isInView) {
+      controls.start('visible');
+    } else {
+      controls.start('hidden');
+    }
+  }, [isInView, controls]);
 
   return controls;
 }
+
 
 export default function Timeline() {
   let batchCount = 0;
@@ -186,7 +180,7 @@ export default function Timeline() {
         <div className="space-y-40 w-full max-w-6xl">
           {timelineData.map((event, idx) => {
             const isEven = idx % 2 === 0;
-            const ref = useRef(null);
+            const ref = useRef<HTMLDivElement>(null);
             const controls = useInViewAnimation(ref);
 
             let batchLabel = '';
@@ -248,7 +242,7 @@ export default function Timeline() {
                       <div className="pt-2">
                         <h3 className="text-sm font-bold">{event.title}</h3>
                         <p className="text-blue-600 font-medium text-xs">{event.date}</p>
-                        <p className="mt-1 text-gray-700 text-xs whitespace-pre-line">
+                        <p className="mt-2 text-gray-700 dark:text-gray-200 whitespace-pre-line">
                           {event.description}
                         </p>
                       </div>
@@ -275,7 +269,7 @@ export default function Timeline() {
                         <div className="pt-6">
                           <h3 className="text-xl font-bold">{event.title}</h3>
                           <p className="text-blue-600 font-semibold">{event.date}</p>
-                          <p className="mt-2 text-gray-700 whitespace-pre-line">{event.description}</p>
+                          <p className="mt-2 text-gray-700 dark:text-gray-200 whitespace-pre-line">{event.description}</p>
                         </div>
                       </motion.div>
                     ) : (
@@ -316,7 +310,7 @@ export default function Timeline() {
                         <div className="pt-6">
                           <h3 className="text-xl font-bold">{event.title}</h3>
                           <p className="text-blue-600 font-semibold">{event.date}</p>
-                          <p className="mt-2 text-gray-700 whitespace-pre-line">{event.description}</p>
+                          <p className="mt-2 text-gray-700 dark:text-gray-200 whitespace-pre-line">{event.description}</p>
                         </div>
                       </motion.div>
                     ) : (

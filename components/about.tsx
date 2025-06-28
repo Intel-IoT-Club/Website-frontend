@@ -53,7 +53,7 @@ export default function About() {
   ]
 
   return (
-    <section id="about" className=" bg-gradient-to-b from-background to-muted py-20">
+    <section id="about" className=" bg-gradient-to-b from-background to-muted py-20 rounded-lg">
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">About the Intel IoT Club</h2>

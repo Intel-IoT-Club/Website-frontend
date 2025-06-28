@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function HackathonPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
-      <section className="w-full max-w-5xl mx-auto p-6 bg-card rounded-2xl shadow-md border">
+      <section className="w-full max-w-5xl mx-auto p-6 bg-card shadow-md border">
         {/* Hackathon Name */}
         <div className="flex justify-center mb-4">
           <div className="px-4 py-1 rounded-lg text-5xl font-extrabold bg-background/80">
