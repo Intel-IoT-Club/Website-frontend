@@ -20,6 +20,15 @@ export default function Projects({ initialProjects }: { initialProjects: any[] }
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
+
+  const goToTop=()=>{
+       if(window.scrollY>0){
+          window.scrollTo({
+            top:0,
+            behavior:"smooth"
+          })
+       }
+  }
   useEffect(() => {
     if (!initialProjects || initialProjects.length === 0) {
       setLoading(true)
@@ -33,10 +42,11 @@ export default function Projects({ initialProjects }: { initialProjects: any[] }
           setLoading(false)
         })
     }
+    goToTop()
   }, [initialProjects])
 
   return (
-    <section id="projects" className="py-20 bg-gradient-to-b from-background to-muted">
+    <section id="projects" className="py-20 bg-gradient-to-b from-background to-muted rounded-lg">
       <div className="container">
         <div className="mb-14 text-center">
           <h2 className="text-4xl font-bold sm:text-5xl tracking-tight">Our Projects</h2>

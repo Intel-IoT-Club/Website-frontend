@@ -17,7 +17,6 @@ import {
   Linkedin,
   Mail,
   MapPin,
-  Phone,
 } from "lucide-react"
 import Link from "next/link"
 import emailjs from "emailjs-com"
@@ -35,6 +34,7 @@ export default function Contact() {
     subject: "",
     message: "",
   })
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -43,50 +43,53 @@ export default function Contact() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      {
-        name: formData.name,
-        email: formData.email,
-        subject: formData.subject,
-        message: formData.message,
-        time: new Date().toLocaleString()
-      },
-      EMAILJS_PUBLIC_KEY
-    )
-      .then(() => {
-        toast("✅ Message sent successfully! Will try to reach to you shortly!")
-        setFormData({ name: "", email: "", subject: "", message: "" })
-      })
-      .catch((error) => {
-        console.error("EmailJS Error:", error)
-        toast("❌ Something went wrong. Please try again later.")
-      })
+    setLoading(true)
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          time: new Date().toLocaleString(),
+        },
+        EMAILJS_PUBLIC_KEY
+      )
+      toast.success("✅ Message sent successfully! Will try to reach to you shortly!")
+      setFormData({ name: "", email: "", subject: "", message: "" })
+    } catch (error) {
+      console.error("EmailJS Error:", error)
+      toast.error("❌ Something went wrong. Please try again later.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <section id="contact" className="py-20 bg-background">
-      <div className="container">
+    <section id="contact" className="py-24 bg-background min-h-[80vh] flex items-center rounded-lg">
+      <div className="container mx-auto max-w-5xl">
         <div className="mb-16 text-center">
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+          <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-primary drop-shadow-lg">
             Get in Touch
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             Whether you're curious about our club, want to collaborate, or have questions—reach out!
           </p>
         </div>
-
         <div className="grid gap-10 md:grid-cols-2">
-          <Card className="shadow-md hover:shadow-lg transition-all duration-300 border-none bg-muted/40">
+          {/* Contact Info Card */}
+          <Card className="shadow-xl border-none bg-gradient-to-br from-muted/60 to-muted/30 backdrop-blur-md">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Contact Information</CardTitle>
+              <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                <Mail className="h-6 w-6 text-primary" /> Contact Information
+              </CardTitle>
               <CardDescription>Reach us through the following details</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5 text-base">
+            <CardContent className="space-y-6 text-base">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-primary" />
                 <span>Amrita Vishwa Vidyapeetham, Coimbatore</span>
@@ -97,13 +100,11 @@ export default function Contact() {
                   inteliotclub@cb.amrita.edu
                 </Link>
               </div>
-
-
               <div className="pt-6 border-t border-border">
-                <h3 className="mb-3 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Follow Us
                 </h3>
-                <div className="flex gap-5">
+                <div className="flex gap-3">
                   <Link href="https://github.com/intel-iot-club" className="hover:text-primary transition-all">
                     <Github className="h-6 w-6" />
                   </Link>
@@ -117,14 +118,16 @@ export default function Contact() {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="shadow-md hover:shadow-lg transition-all duration-300 border-none bg-muted/40">
+          {/* Contact Form Card */}
+          <Card className="shadow-xl border-none bg-gradient-to-br from-muted/60 to-muted/30 backdrop-blur-md">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Send a Message</CardTitle>
+              <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                <Mail className="h-6 w-6 text-primary" /> Send a Message
+              </CardTitle>
               <CardDescription>We usually respond within 24 hours</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block mb-1 text-sm font-medium">
                     Name
@@ -139,7 +142,6 @@ export default function Contact() {
                     className="rounded-md"
                   />
                 </div>
-
                 <div>
                   <label htmlFor="email" className="block mb-1 text-sm font-medium">
                     Email
@@ -155,7 +157,6 @@ export default function Contact() {
                     className="rounded-md"
                   />
                 </div>
-
                 <div>
                   <label htmlFor="subject" className="block mb-1 text-sm font-medium">
                     Subject
@@ -170,7 +171,6 @@ export default function Contact() {
                     className="rounded-md"
                   />
                 </div>
-
                 <div>
                   <label htmlFor="message" className="block mb-1 text-sm font-medium">
                     Message
@@ -186,12 +186,15 @@ export default function Contact() {
                     className="rounded-md"
                   />
                 </div>
-
                 <Button
                   type="submit"
-                  className="w-full rounded-full transition-all duration-300 bg-primary text-white hover:bg-primary/90 hover:shadow-lg"
+                  className="w-full rounded-full transition-all duration-300 bg-primary text-white hover:bg-primary/90 hover:shadow-lg text-lg font-semibold py-3 flex items-center justify-center gap-2"
+                  disabled={loading}
                 >
-                  Send Message
+                  {loading ? (
+                    <span className="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full inline-block"></span>
+                  ) : null}
+                  {loading ? "Sending..." : "Send Message"}
                 </Button>
               </form>
             </CardContent>

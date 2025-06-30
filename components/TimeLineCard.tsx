@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
+import useInViewAnimation from '../hooks/use-inview';
 
 type TimelineEvent = {
   _id: string;
@@ -19,32 +20,9 @@ type Props = {
   batchLabel?: string;
 };
 
-function useInViewAnimation(ref: React.RefObject<HTMLElement>) {
-  const controls = useAnimation();
-
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          controls.start('visible');
-        } else {
-          controls.start('hidden');
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (ref.current) observer.observe(ref.current);
-    return () => ref.current && observer.unobserve(ref.current);
-  }, [ref, controls]);
-
-  return controls;
-}
-
 export default function TimelineCard({ event, idx, batchLabel }: Props) {
   const isEven = idx % 2 === 0;
-  const ref = useRef(null);
-  const controls = useInViewAnimation(ref);
+  const { ref, controls } = useInViewAnimation();
 
   return (
     <div ref={ref} className="relative">
@@ -65,7 +43,7 @@ export default function TimelineCard({ event, idx, batchLabel }: Props) {
       {/* MOBILE VIEW */}
       <div className="block md:hidden pt-24 px-2">
         <motion.div
-          className={`flex flex-row items-start gap-3 w-full ${idx % 2 === 1 ? 'flex-row-reverse' : ''}`}
+          className={`flex flex-row items-start gap-3 w-full ${!isEven ? 'flex-row-reverse' : ''}`}
           initial={{ opacity: 0 }}
           animate={controls}
           variants={{
@@ -86,14 +64,22 @@ export default function TimelineCard({ event, idx, batchLabel }: Props) {
             <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 rounded mb-2">
               <div
                 className={`absolute top-1/2 transform -translate-y-1/2 w-2 h-2 rounded-full bg-white border-2 border-blue-500 ${
-                  idx % 2 === 1 ? 'left-0' : 'right-0'
+                  !isEven ? 'left-0' : 'right-0'
                 }`}
               />
             </div>
             <div className="pt-2">
               <h3 className="text-sm font-bold">{event.title}</h3>
-              <p className="text-blue-600 font-medium text-xs">{event.date}</p>
-              <p className="mt-1 text-gray-700 text-xs whitespace-pre-line">{event.description}</p>
+              <p className="text-blue-600 font-medium text-xs">
+                {new Date(event.date).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </p>
+              <p className="mt-1 text-gray-700 text-xs whitespace-pre-line">
+                {event.description}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -117,7 +103,13 @@ export default function TimelineCard({ event, idx, batchLabel }: Props) {
               </div>
               <div className="pt-6">
                 <h3 className="text-xl font-bold">{event.title}</h3>
-                <p className="text-blue-600 font-semibold">{event.date}</p>
+                <p className="text-blue-600 font-semibold">
+                  {new Date(event.date).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </p>
                 <p className="mt-2 text-gray-700 whitespace-pre-line">{event.description}</p>
               </div>
             </motion.div>
@@ -158,8 +150,14 @@ export default function TimelineCard({ event, idx, batchLabel }: Props) {
               </div>
               <div className="pt-6">
                 <h3 className="text-xl font-bold">{event.title}</h3>
-                <p className="text-blue-600 font-semibold">{event.date}</p>
-                <p className="mt-2 text-gray-700 whitespace-pre-line">{event.description}</p>
+                <p className="text-blue-600 font-semibold">
+                  {new Date(event.date).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </p>
+                <p className="mt-2 text-muted-foreground whitespace-pre-line">{event.description}</p>
               </div>
             </motion.div>
           ) : (

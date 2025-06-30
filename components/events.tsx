@@ -79,7 +79,7 @@ export default function Events({ initialEvents }: { initialEvents: any[] }) {
   )
 
   return (
-    <section id="events" className="py-20 bg-gradient-to-b from-background to-muted">
+    <section id="events" className="py-20 bg-gradient-to-b from-background to-muted rounded-lg">
       <div className="container">
         <div className="mb-16 text-center">
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">

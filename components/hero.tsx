@@ -77,8 +77,10 @@ function BlueDotsAnimation() {
 export default function Hero() {
   const [show3D, setShow3D] = useState(true)
   const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     // Disable 3D animation for small screens (e.g., width < 640px)
     const checkScreen = () => {
       setShow3D(window.innerWidth >= 640)
@@ -103,14 +105,22 @@ export default function Hero() {
 
         <h1
           className="mb-32 sm:mb-48 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
-          style={resolvedTheme === "dark" ? { textShadow: '0 0 4px #000, 0 0 4px #000, 0 0 4px #000' } : {}}
+          style={
+            mounted && resolvedTheme === "dark"
+              ? { textShadow: "0 0 4px #000, 0 0 4px #000, 0 0 4px #000" }
+              : {}
+          }
         >
           Empowering Innovation through Intel IoT
         </h1>
 
         <p
           className="mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl"
-          style={resolvedTheme === "dark" ? { textShadow: '0 0 2px #000, 0 0 2px #000, 0 0 2px #000' } : {}}
+          style={
+            mounted && resolvedTheme === "dark"
+              ? { textShadow: "0 0 2px #000, 0 0 2px #000, 0 0 2px #000" }
+              : {}
+          }
         >
           Exploring the intersection of hardware, software, and connectivity
         </p>

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import api from "@/lib/api";
 import { toast } from "@/components/ui/use-toast";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 interface EventType {
   _id: string;
@@ -356,6 +357,7 @@ const handleDeleteTimeline = async (id: string) => {
 };
 
   return (
+    <ProtectedRoute>
     <div className="w-full max-w-3xl mx-auto p-6">
       <div className="flex justify-center gap-4 mb-8">
         <button
@@ -844,5 +846,6 @@ const handleDeleteTimeline = async (id: string) => {
 )}
 
     </div>
+    </ProtectedRoute>
   );
 }

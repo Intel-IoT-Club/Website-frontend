@@ -18,36 +18,74 @@ export default function Footer() {
               Empowering innovation through Intel IoT technologies.
             </p>
             <div className="flex gap-4">
-              <Link href="https://github.com/intel-iot-club" aria-label="GitHub" className="hover:text-foreground transition">
+              <Link
+                href="https://github.com/intel-iot-club"
+                aria-label="GitHub"
+                className="hover:text-foreground transition"
+              >
                 <Github className="h-5 w-5" />
               </Link>
-              <Link href="https://www.linkedin.com/company/intel-iot-club/" aria-label="LinkedIn" className="hover:text-foreground transition">
+              <Link
+                href="https://www.linkedin.com/company/intel-iot-club/"
+                aria-label="LinkedIn"
+                className="hover:text-foreground transition"
+              >
                 <Linkedin className="h-5 w-5" />
               </Link>
-              <Link href="mailto:inteliotclub@gmail.com" aria-label="Email" className="hover:text-foreground transition">
+              <Link
+                href="mailto:inteliotclub@gmail.com"
+                aria-label="Email"
+                className="hover:text-foreground transition"
+              >
                 <Mail className="h-5 w-5" />
               </Link>
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <div className="grid grid-cols-2 col-span-2 gap-8 sm:grid-cols-3 text-sm">
-            <div>
-              <h4 className="mb-3 font-medium text-foreground">Explore</h4>
-              <ul className="space-y-2">
-                <li><Link href="/" className="hover:text-foreground transition">Home</Link></li>
-                <li><Link href="/about" className="hover:text-foreground transition">About</Link></li>
-                <li><Link href="/projects" className="hover:text-foreground transition">Projects</Link></li>
-              </ul>
-            </div>
+          {/* Navigation Links - Center Aligned with More Spacing */}
+          <div className="col-span-2 flex justify-center text-sm">
+            <div className="grid grid-cols-2 gap-20 sm:gap-44">
+              <div>
+                <h4 className="mb-3 font-medium text-foreground">Explore</h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/" className="hover:text-foreground transition">
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/about" className="hover:text-foreground transition">
+                      About
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/projects" className="hover:text-foreground transition">
+                      Projects
+                    </Link>
+                  </li>
+                </ul>
+              </div>
 
-            <div>
-              <h4 className="mb-3 font-medium text-foreground">Resources</h4>
-              <ul className="space-y-2">
-                <li><Link href="/events" className="hover:text-foreground transition">Events</Link></li>
-                <li><Link href="/team" className="hover:text-foreground transition">Team</Link></li>
-                <li><Link href="/contact" className="hover:text-foreground transition">Contact</Link></li>
-              </ul>
+              <div>
+                <h4 className="mb-3 font-medium text-foreground">Resources</h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/events" className="hover:text-foreground transition">
+                      Events
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/team" className="hover:text-foreground transition">
+                      Team
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/contact" className="hover:text-foreground transition">
+                      Contact
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
