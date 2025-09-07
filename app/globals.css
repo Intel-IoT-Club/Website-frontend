@@ -2,65 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
+/* -----------------------------
+   Base variables & theme setup
+   ----------------------------- */
 @layer base {
   :root {
+    /* Core palette (light-mode defaults) */
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 221 83% 53.3%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
     --ring: 221 83% 53.3%;
     --radius: 1rem;
+
+    /* Neon control: H S L (use with hsl(var(--neon-blue)) or hsl(var(--neon-blue)/alpha) */
+    --neon-blue: 187 95% 60%;   /* light mode neon (subtle) */
+    --neon-outer-alpha: 0.30;
+    --neon-mid-alpha: 0.55;
+    --neon-inner-alpha: 0.9;
   }
+   body { background-color: #e6f7ff; }
+   :root body { background-color: #e6f7ff; }  /* one-liner in globals.css; .dark overrides remain */
+
 
   .dark {
+    /* Dark-mode base values */
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
     --ring: 224.3 76.3% 48%;
+
+    /* Stronger neon for dark mode so glow pops */
+    --neon-blue: 200 100% 64%;    /* slightly cyan-leaning bright blue */
+    --neon-outer-alpha: 0.8;
+    --neon-mid-alpha: 0.6;
+    --neon-inner-alpha: 1;
   }
 }
 
 @layer base {
+  /* global resets & usage */
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     scroll-behavior: smooth;
+    background-color: #0a0a0a; /* fallback */
+  }
+  .timeline, .timeline-section { position: relative !important; max-height: 75vh !important; overflow-y: auto !important; z-index: 10 !important; }
+
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen;
   }
 }
 
+/* -----------------------------
+   Dark-mode background to emphasize neon
+   ----------------------------- */
+/* apply only when .dark is present on <html> (next-themes / theme-provider pattern) */
+.dark body {
+  background-color: #050607;
+  /* subtle radial center glow + soft vignette for depth */
+  background-image:
+    radial-gradient(600px 400px at 50% 20%, hsl(var(--neon-blue) / 0.06), transparent 25%),
+    radial-gradient(400px 260px at 80% 70%, hsl(var(--neon-blue) / 0.03), transparent 30%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.12), transparent 40%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 6s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 10s ease-in-out infinite;
+}
+
+/* -----------------------------
+   Animations
+   ----------------------------- */
 @keyframes fade-in-down {
   0% {
     opacity: 0;
@@ -73,32 +107,201 @@
 }
 
 .animate-fade-in-down {
-  animation: fade-in-down 0.3s ease-out both;
+  animation: fade-in-down 0.36s ease-out both;
 }
 
+/* -----------------------------
+   Utilities: neon glow + UI polish
+   ----------------------------- */
 @layer utilities {
-  .interactive-hover {
-    @apply transition-all duration-300 ease-in-out hover:scale-105;
+  /* Text neon glow — uses HSL var so it adapts to dark/light */
+  .neon-glow {
+    text-shadow:
+      0 0 4px hsl(var(--neon-blue) / var(--neon-inner-alpha)),
+      0 0 10px hsl(var(--neon-blue) / var(--neon-mid-alpha)),
+      0 0 24px hsl(var(--neon-blue) / var(--neon-outer-alpha));
+    /* a tiny drop-shadow to make it crisp on some browsers */
+    filter: drop-shadow(0 0 6px hsl(var(--neon-blue) / calc(var(--neon-mid-alpha) * 0.9)));
   }
 
-  .subtle-shadow {
-    @apply shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_-5px_rgba(0,0,0,0.2)];
+  /* Stronger neon for dark mode (applies automatically because variables change) */
+  .neon-glow-strong {
+    text-shadow:
+      0 0 6px hsl(var(--neon-blue) / var(--neon-inner-alpha)),
+      0 0 14px hsl(var(--neon-blue) / var(--neon-mid-alpha)),
+      0 0 36px hsl(var(--neon-blue) / var(--neon-outer-alpha));
+    filter: drop-shadow(0 0 10px hsl(var(--neon-blue) / var(--neon-mid-alpha)));
   }
 
-  /* Touch-friendly interactions for tablets */
-  .touch-target {
-    touch-action: manipulation;
-    @apply transition-colors duration-200;
+  /* Background/card glow — use on buttons, cards and nav */
+  .neon-glow-bg {
+    box-shadow:
+      0 8px 30px -12px hsl(var(--neon-blue) / calc(var(--neon-outer-alpha) * 0.9)),
+      0 0 22px -6px hsl(var(--neon-blue) / calc(var(--neon-mid-alpha) * 0.9)),
+      inset 0 1px 0 hsl(var(--neon-blue) / 0.06);
+    transition: box-shadow .18s ease, transform .18s ease;
   }
 
-  /* Tablet-specific container padding */
-  .tablet-container {
-    @apply px-6 lg:px-8 xl:px-12;
+  /* hover intensify for neon-bg elements (buttons/cards) */
+  .neon-glow-bg:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+      0 16px 50px -18px hsl(var(--neon-blue) / var(--neon-outer-alpha)),
+      0 0 36px -6px hsl(var(--neon-blue) / var(--neon-mid-alpha)),
+      inset 0 2px 0 hsl(var(--neon-blue) / 0.08);
   }
 
-  /* Smooth scrolling with momentum for mobile devices */
-  .smooth-scroll {
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+  /* subtle overlay radial for sections that need a halo (optional utility) */
+  .neon-halo {
+    position: relative;
+  }
+  .neon-halo::before {
+    content: "";
+    position: absolute;
+    inset: -8%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(600px 300px at 50% 10%, hsl(var(--neon-blue) / 0.12), transparent 35%);
+    filter: blur(20px);
+    opacity: 0.95;
+  }
+  .neon-halo > * { position: relative; z-index: 1; }
+
+  /* button polish */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all;
+  }
+  .btn-primary {
+    @apply bg-blue-600 text-white shadow-md;
+  }
+  .btn-primary:hover {
+    /* combine existing hover + neon */
+    transform: translateY(-3px);
+  }
+
+  /* section title baseline — glowing and legible */
+  .section-title {
+    @apply text-3xl font-bold text-blue-300 mb-6;
+    text-shadow: 0 0 6px hsl(var(--neon-blue) / 0.35);
+  }
+  /* Cyberpunk dark neon background */
+body {
+  background-color: #0a0a0a; /* Deep dark base */
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(255, 0, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(0, 255, 128, 0.1) 0%, transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  color: #e0e0e0;
+}
+
+/* Dark text for light background */
+.dark-text {
+  color: #111; /* Almost black */
+  text-shadow: none; /* Remove glow completely */
+}
+/* Base dark background with radial neon glow */
+body, html {
+  @apply bg-gray-900 text-gray-100 min-h-screen;
+  background-color: #0a0a0a;
+  background-image: radial-gradient(circle at center, rgba(255, 0, 238, 0.1) 0%, transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+
+/* Or subtle glow if needed */
+.subtle-neon {
+  color: #111; 
+  text-shadow: 
+    0 0 2px rgba(0, 255, 255, 0.2),
+    0 0 4px rgba(0, 255, 255, 0.1);
+}
+
+
+/* Neon glow for buttons/cards */
+.neon-glow-bg {
+  box-shadow:
+    0 0 10px #0ff,
+    0 0 20px #0ff,
+    0 0 40px #0ff,
+    0 0 80px #0ff;
+}
+
+/* Optional subtle animated glow */
+@keyframes pulse-neon {
+  0%, 100% {
+    text-shadow:
+      0 0 5px #0ff,
+      0 0 10px #0ff,
+      0 0 20px #0ff,
+      0 0 40px #0ff;
+  }
+  50% {
+    text-shadow:
+      0 0 10px #0ff,
+      0 0 20px #0ff,
+      0 0 30px #0ff,
+      0 0 60px #0ff;
   }
 }
+
+.animate-neon {
+  animation: pulse-neon 2s infinite alternate;
+}
+
+
+  /* card baseline & hover lift */
+  .card {
+    @apply bg-slate-900/60 rounded-lg p-4 transition-all;
+    box-shadow: 0 6px 18px -10px rgba(0,0,0,0.6);
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px -26px rgba(0,0,0,0.6), 0 0 24px hsl(var(--neon-blue) / 0.12);
+  }
+
+  /* micro interactions */
+  .interactive-hover { @apply transition-all duration-300 ease-in-out hover:scale-105; }
+  .subtle-shadow { @apply shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] dark:shadow-[0_6px_30px_-8px_rgba(0,0,0,0.35)]; }
+
+  /* touch / spacing helpers (kept from original) */
+  .touch-target { touch-action: manipulation; @apply transition-colors duration-200; }
+  .tablet-container { @apply px-6 lg:px-8 xl:px-12; }
+  .smooth-scroll { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+}
+
+/* small accessibility / focus outline using neon */
+:where(button, a, input, textarea):focus {
+  outline: 3px solid hsl(var(--neon-blue) / 0.18);
+  outline-offset: 3px;
+  box-shadow: 0 0 10px hsl(var(--neon-blue) / 0.12);
+}
+
+/* Light-mode final polish: keep glow subtle so text stays readable */
+:root body,
+:root .neon-glow,
+:root .neon-glow-bg {
+  /* nothing extra — variables keep it subtle in light mode */
+}
+
+/* Dark-mode stronger helpers (explicit) */
+.dark .neon-glow {
+  /* make text neon-strong in dark mode */
+  text-shadow:
+    0 0 6px hsl(var(--neon-blue) / var(--neon-inner-alpha)),
+    0 0 18px hsl(var(--neon-blue) / var(--neon-mid-alpha)),
+    0 0 44px hsl(var(--neon-blue) / var(--neon-outer-alpha));
+}
+
+.dark .neon-glow-bg {
+  box-shadow:
+    0 20px 60px -20px hsl(var(--neon-blue) / var(--neon-outer-alpha)),
+    0 0 36px -6px hsl(var(--neon-blue) / var(--neon-mid-alpha)),
+    inset 0 2px 0 hsl(var(--neon-blue) / 0.08);
+}
+
+/* End of file */

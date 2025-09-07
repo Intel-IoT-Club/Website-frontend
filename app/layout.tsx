@@ -1,38 +1,30 @@
-import "@/app/globals.css"
-import Footer from "@/components/footer"
-import Navbar from "@/components/navbar"
-import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
-import { Inter } from "next/font/google"
-import type React from "react"
+import "./globals.css"; // relative path
+import Footer from "../components/footer";
+import Navbar from "../components/navbar";
+import { Inter } from "next/font/google";
+import React from "react";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
+// Metadata works because this is a server component
 export const metadata = {
   title: "Intel IoT Club",
-  description: "Empowering Innovation through Intel IoT technologies"
-}
+  description: "Empowering Innovation through Intel IoT technologies",
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="relative flex min-h-screen flex-col">
-            <Navbar />
-            {children}
-            <Footer />
-            <Toaster />
-          </div>
-        </ThemeProvider>
+      <body className={`${inter.className} bg-background text-foreground neon-glow-bg`}>
+        <div className="relative flex min-h-screen flex-col">
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
-  )
+  );
 }

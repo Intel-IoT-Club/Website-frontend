@@ -26,16 +26,16 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 transition-shadow">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur-xl transition-shadow">
       <div className="container mx-auto flex h-16 lg:h-20 items-center justify-between px-4 lg:px-6">
         <Link
           href="/"
-          className="text-2xl lg:text-3xl font-extrabold tracking-tight truncate"
+          className="text-2xl lg:text-3xl font-extrabold tracking-tight truncate hover:text-blue-400 hover:scale-105 transition-transform duration-300"
         >
           Intel IoT Club
         </Link>
 
-        {/* Desktop Nav - Hidden on tablet and below for better UX */}
+        {/* Desktop Nav */}
         <nav className="hidden xl:flex items-center gap-8">
           {navItems.map((item) =>
             item.external ? (
@@ -44,92 +44,42 @@ export default function Navbar() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`relative text-sm font-semibold transition-all duration-200 hover:text-primary ${
+                className={cn(
+                  "relative text-sm font-semibold transition duration-300 hover:text-blue-400 hover:scale-105 hover:drop-shadow-[0_0_10px_#00f]",
                   pathname === item.href
                     ? "text-primary"
                     : "text-muted-foreground"
-                }`}
+                )}
               >
-                <span className="group inline-block">
-                  {item.name}
-                  <span className="block h-[3px] max-w-0 bg-primary transition-all duration-300 group-hover:max-w-full rounded-full"></span>
-                </span>
+                {item.name}
               </a>
             ) : (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`relative text-sm font-semibold transition-all duration-200 hover:text-primary ${
+                className={cn(
+                  "relative text-sm font-semibold transition duration-300 hover:text-blue-400 hover:scale-105 hover:drop-shadow-[0_0_10px_#00f]",
                   pathname === item.href
                     ? "text-primary"
                     : "text-muted-foreground"
-                }`}
+                )}
               >
-                <span className="group inline-block">
-                  {item.name}
-                  <span className="block h-[3px] max-w-0 bg-primary transition-all duration-300 group-hover:max-w-full rounded-full"></span>
-                </span>
+                {item.name}
               </Link>
-            ),
+            )
           )}
           <ThemeToggle />
           <Link href="/contact">
             <Button
               size="lg"
-              className="ml-2 text-base font-semibold px-5 py-2.5"
+              className="ml-2 text-base font-semibold px-5 py-2.5 hover:scale-105 hover:shadow-lg hover:shadow-blue-500 transition-all duration-300"
             >
               Join the Club
             </Button>
           </Link>
         </nav>
 
-        {/* Tablet Nav - Compact horizontal nav for tablets */}
-        <nav className="hidden lg:flex xl:hidden items-center gap-4">
-          {navItems.slice(0, 6).map((item) =>
-            item.external ? (
-              <a
-                key={item.name}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`relative text-xs font-medium transition-all duration-200 hover:text-primary ${
-                  pathname === item.href
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <span className="group inline-block">
-                  {item.name}
-                  <span className="block h-[2px] max-w-0 bg-primary transition-all duration-300 group-hover:max-w-full rounded-full"></span>
-                </span>
-              </a>
-            ) : (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`relative text-xs font-medium transition-all duration-200 hover:text-primary ${
-                  pathname === item.href
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <span className="group inline-block">
-                  {item.name}
-                  <span className="block h-[2px] max-w-0 bg-primary transition-all duration-300 group-hover:max-w-full rounded-full"></span>
-                </span>
-              </Link>
-            ),
-          )}
-          <button
-            className="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-muted transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="More Menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        </nav>
-
-        {/* Mobile/Tablet Toggle */}
+        {/* Tablet + Mobile Nav toggle */}
         <button
           className="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring hover:bg-muted transition-colors"
           onClick={() => setIsOpen(!isOpen)}
@@ -139,17 +89,16 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile/Tablet Nav Dropdown */}
+      {/* Mobile Nav Dropdown */}
       <div
         className={cn(
           "xl:hidden overflow-hidden transition-all duration-500 ease-in-out",
           isOpen
             ? "max-h-screen opacity-100 translate-y-0"
-            : "max-h-0 opacity-0 -translate-y-2",
+            : "max-h-0 opacity-0 -translate-y-2"
         )}
       >
         <div className="rounded-b-xl border-t bg-background/95 backdrop-blur-md px-4 py-6 shadow-lg animate-fade-in-down">
-          {/* For tablets (lg breakpoint), show in a grid layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
             {navItems.map((item, i) =>
               item.external ? (
@@ -160,9 +109,9 @@ export default function Navbar() {
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "flex items-center rounded-lg px-4 py-3 text-base font-medium text-muted-foreground transition-all hover:bg-muted hover:text-primary touch-manipulation",
+                    "flex items-center rounded-lg px-4 py-3 text-base font-medium text-muted-foreground transition-all hover:bg-muted hover:text-blue-400 hover:scale-105 hover:drop-shadow-[0_0_8px_#00f]",
                     pathname === item.href && "text-primary bg-muted/50",
-                    `delay-[${i * 50}ms]`,
+                    `delay-[${i * 50}ms]`
                   )}
                 >
                   {item.name}
@@ -173,22 +122,20 @@ export default function Navbar() {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "flex items-center rounded-lg px-4 py-3 text-base font-medium text-muted-foreground transition-all hover:bg-muted hover:text-primary touch-manipulation",
+                    "flex items-center rounded-lg px-4 py-3 text-base font-medium text-muted-foreground transition-all hover:bg-muted hover:text-blue-400 hover:scale-105 hover:drop-shadow-[0_0_8px_#00f]",
                     pathname === item.href && "text-primary bg-muted/50",
-                    `delay-[${i * 50}ms]`,
+                    `delay-[${i * 50}ms]`
                   )}
                 >
                   {item.name}
                 </Link>
-              ),
+              )
             )}
           </div>
-
-          {/* Action buttons - better spacing for tablets */}
           <div className="mt-6 pt-4 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
             <ThemeToggle />
             <Link href="/contact" onClick={() => setIsOpen(false)}>
-              <Button size="lg" className="w-full sm:w-auto touch-manipulation">
+              <Button size="lg" className="w-full sm:w-auto hover:scale-105 hover:shadow-lg hover:shadow-blue-500 transition-all duration-300">
                 Join the Club
               </Button>
             </Link>

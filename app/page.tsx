@@ -1,12 +1,19 @@
-import Hero from "@/components/Hero";
-import Events from "@/components/Events";
+// app/page.tsx
+import Hero from "../components/hero"; // relative import
+import Projects from "../components/projects";
+import Events from "../components/events";
+import Contact from "../components/contact";
 
-// Fetch data on the server and pass as props
-export default async function Home() {
+export default function HomePage() {
   return (
-    <main className="flex-1 pb-16 lg:pb-20 xl:pb-24">
-      <Hero />
+    <main className="flex flex-col gap-8">
+      {/* Hero Section */}
+      <Hero />  
+
+      {/* Optional sections below */}
+      
       <Events />
+      <Contact />
     </main>
   );
 }

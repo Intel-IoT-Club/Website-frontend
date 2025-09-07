@@ -1,4 +1,7 @@
-import Events from "@/components/events";
+// app/events/page.tsx
+
+// app/events/page.tsx
+import Events from "../../components/events";
 
 export default function EventsPage() {
   return (
@@ -7,3 +10,4 @@ export default function EventsPage() {
     </main>
   );
 }
+
