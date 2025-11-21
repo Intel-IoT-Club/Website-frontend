@@ -290,9 +290,11 @@ export default function Projects({ initialProjects }: { initialProjects: any[] }
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-sm text-primary mb-4">
+          <Link href="/contact" className="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-sm text-primary mb-4 hover:bg-primary/20 transition-colors"
+          >
             <ArrowRight className="h-4 w-4 mr-1" /> Want to see your project here?
-          </div>
+          </Link>
+
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
             Join our club and start building innovative IoT solutions with industry experts and cutting-edge technology.
           </p>
