@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import api from "@/lib/api";
 import {
   CalendarDays,
   Clock,
@@ -13,8 +14,9 @@ import {
   Users,
   Sparkles,
   Ticket,
+  Search,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 
@@ -43,46 +45,87 @@ const hoverVariants: Variants = {
   },
 };
 
-export default function Events({ initialEvents = [] }: { initialEvents?: any[] }) {
-  const [events, setEvents] = useState<any[]>(initialEvents || []);
-  const [loading, setLoading] = useState(true);
+interface Event {
+  image: string;
+  id: number;
+  name: string;
+  date: string;
+  time: string;
+  location: string;
+  description: string;
+  type?: string;
+  attendees?: number;
+  status?: "upcoming" | "past" | "ongoing";
+}
+
+export default function Events({
+  initialEvents = [],
+}: {
+  initialEvents?: Event[];
+}) {
+  const [events, setEvents] = useState<Event[]>(initialEvents || []);
   const [error, setError] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // -------------------------------------------------
-  // FIX: No client fetching — events come from server.
-  // Keep loading/error for UI, but disable fetching.
-  // -------------------------------------------------
+  // Decide once whether we need to fetch from API
+  const shouldFetchOnClient = useMemo(
+    () => !initialEvents || initialEvents.length === 0,
+    [initialEvents]
+  );
+
+  const [loading, setLoading] = useState(shouldFetchOnClient);
+
   useEffect(() => {
-    if (initialEvents && initialEvents.length > 0) {
-      setEvents(initialEvents);
+    // If we already have events from the server, don't fetch
+    if (!shouldFetchOnClient) {
       setLoading(false);
-    } else {
-      // No events passed → show empty state without fetch
-      setEvents([]);
-      setLoading(false);
+      return;
     }
-  }, [initialEvents]);
+
+    let cancelled = false;
+
+    const fetchEvents = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        // ⚠️ Make sure this matches your backend route, often `/api/events`
+        const res = await api.get("/events");
+        if (!cancelled) {
+          setEvents(res.data || []);
+        }
+      } catch (err) {
+        console.error("Error loading events:", err);
+        if (!cancelled) {
+          setError("Failed to load events.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchEvents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldFetchOnClient]);
 
   const eventTypes = ["upcoming", "past", "workshop", "competition"];
 
-  const filteredEvents =
-    activeFilter === "all"
-      ? events
-      : events.filter((event) => event.type === activeFilter);
+  const filteredEvents = events.filter((event) => {
+    const matchesFilter =
+      activeFilter === "all" || event.type === activeFilter;
 
-  interface Event {
-    image: string;
-    id: number;
-    name: string;
-    date: string;
-    time: string;
-    location: string;
-    description: string;
-    type?: string;
-    attendees?: number;
-    status?: "upcoming" | "past" | "ongoing";
-  }
+    const matchesSearch = event.name
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    return matchesFilter && matchesSearch;
+  });
 
   const EventCard = ({ event, index }: { event: Event; index: number }) => (
     <motion.div
@@ -94,7 +137,6 @@ export default function Events({ initialEvents = [] }: { initialEvents?: any[] }
     >
       <motion.div variants={hoverVariants} className="h-full">
         <Card className="group flex flex-col h-full overflow-hidden border border-border/50 shadow-lg hover:shadow-2xl hover:shadow-blue-200/20 transition-all duration-500 bg-card/80 backdrop-blur-md rounded-2xl hover:-translate-y-1 relative">
-          
           {event.status && (
             <div
               className={`absolute top-4 right-4 z-10 flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm ${
@@ -164,12 +206,10 @@ export default function Events({ initialEvents = [] }: { initialEvents?: any[] }
                 <Clock className="mr-2 h-4 w-4 text-indigo-500" />
                 <span>{event.time}</span>
               </div>
-
               <div className="flex items-center text-muted-foreground">
                 <MapPin className="mr-2 h-4 w-4 text-pink-500" />
                 <span className="line-clamp-1">{event.location}</span>
               </div>
-
               {event.attendees && (
                 <div className="flex items-center text-muted-foreground">
                   <Users className="mr-2 h-4 w-4 text-green-500" />
@@ -178,7 +218,6 @@ export default function Events({ initialEvents = [] }: { initialEvents?: any[] }
               )}
             </div>
           </CardContent>
-
         </Card>
       </motion.div>
     </motion.div>
@@ -194,29 +233,41 @@ export default function Events({ initialEvents = [] }: { initialEvents?: any[] }
       <div className="absolute bottom-0 -left-20 w-72 h-72 bg-indigo-400/10 rounded-full blur-3xl"></div>
 
       <div className="container relative z-10 px-4">
-        
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mb-16 text-center"
+          className="mb-10 text-center"
         >
           <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary mb-6">
             <Sparkles className="h-4 w-4 mr-2" /> Upcoming Experiences
           </div>
-
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
             Club Events
           </h2>
-
           <p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
             Join us for immersive workshops, competitions, and guest talks that
             expand your IoT horizons.
           </p>
         </motion.div>
 
-        {/* Filter buttons */}
+        {/*  Search Bar */}
+        <div className="flex justify-center mb-8">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search events by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground shadow-sm"
+            />
+          </div>
+        </div>
+
+        {/* Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -234,7 +285,6 @@ export default function Events({ initialEvents = [] }: { initialEvents?: any[] }
           >
             All Events
           </button>
-
           {eventTypes.map((type) => (
             <button
               key={type}
@@ -250,12 +300,14 @@ export default function Events({ initialEvents = [] }: { initialEvents?: any[] }
           ))}
         </motion.div>
 
-        {/* Loading State */}
+        {/* Event Grid / States */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-muted-foreground">Loading exciting events...</p>
+              <p className="text-muted-foreground">
+                Loading exciting events...
+              </p>
             </div>
           </div>
         ) : error ? (
@@ -295,7 +347,6 @@ export default function Events({ initialEvents = [] }: { initialEvents?: any[] }
             </p>
           </motion.div>
         )}
-
       </div>
     </section>
   );
