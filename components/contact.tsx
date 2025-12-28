@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { toast } from "sonner";
-import emailjs from "emailjs-com";
+import api from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,26 +17,26 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { z } from "zod";
 
-// Updated icons (latest lucide-react)
+// Icons
 import {
-  GithubIcon,
-  InstagramIcon,
-  LinkedinIcon,
+  Github,
+  Instagram,
+  Linkedin,
   Mail,
   MapPin,
   Phone,
   Send,
-  MessageCircle,
   User,
+  Loader2,
+  MessageCircle,
   ArrowRight,
   Sparkles,
 } from "lucide-react";
 
-// EmailJS variables
-const EMAILJS_SERVICE_ID = "service_bg55nmd";
-const EMAILJS_TEMPLATE_ID = "template_dl7if3n";
-const EMAILJS_PUBLIC_KEY = "q0OlBKnc-NmZqukqE";
+// API endpoint for contact form submission
+const CONTACT_API_URL = 'http://localhost:5000/api/contact';
 
 // Animations
 const containerVariants: Variants = {
@@ -70,34 +70,72 @@ export default function Contact() {
     message: "",
   });
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Form validation schema
+  const contactSchema = z.object({
+    name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+    email: z.string().email({ message: "Please enter a valid email address" }),
+    subject: z.string().min(5, { message: "Subject must be at least 5 characters" }),
+    message: z.string().min(10, { message: "Message must be at least 10 characters" })
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    try {
+      contactSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMap: Record<string, string> = {};
+        error.errors.forEach(err => {
+          if (err.path) {
+            errorMap[err.path[0]] = err.message;
+          }
+        });
+        setErrors(errorMap);
+      }
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      toast.error("Please fix the form errors before submitting.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          ...formData,
-          time: new Date().toLocaleString(),
-        },
-        EMAILJS_PUBLIC_KEY
-      );
+      const response = await api.post("/contact", formData);
 
-      toast.success("Message sent successfully! We'll get back to you shortly.");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      if (response.status >= 200 && response.status < 300) {
+        toast.success("Message sent successfully! We'll get back to you soon.");
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        throw new Error(response.data?.message || 'Failed to send message');
+      }
     } catch (error) {
-      console.error("EmailJS Error:", error);
-      toast.error("Something went wrong. Please try again later.");
+      console.error("Error sending message:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send message. Please try again later.';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -190,7 +228,7 @@ export default function Contact() {
                       className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-primary hover:text-white"
                       title="GitHub"
                     >
-                      <GithubIcon className="h-5 w-5" />
+                      <Github className="h-5 w-5" />
                     </Link>
 
                     <Link
@@ -198,7 +236,7 @@ export default function Contact() {
                       className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-primary hover:text-white"
                       title="LinkedIn"
                     >
-                      <LinkedinIcon className="h-5 w-5" />
+                      <Linkedin className="h-5 w-5" />
                     </Link>
 
                     <Link
@@ -206,7 +244,7 @@ export default function Contact() {
                       className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-primary hover:text-white"
                       title="Instagram"
                     >
-                      <InstagramIcon className="h-5 w-5" />
+                      <Instagram className="h-5 w-5" />
                     </Link>
                   </div>
                 </div>
@@ -238,8 +276,12 @@ export default function Contact() {
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="Your name"
-                        required
+                        className={errors.name ? 'border-red-500' : ''}
+                        suppressHydrationWarning
                       />
+                      {errors.name && (
+                        <p className="text-sm text-red-500 mt-1">{errors.name}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -252,8 +294,12 @@ export default function Contact() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="Your email"
-                        required
+                        className={errors.email ? 'border-red-500' : ''}
+                        suppressHydrationWarning
                       />
+                      {errors.email && (
+                        <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+                      )}
                     </div>
                   </div>
 
@@ -264,8 +310,12 @@ export default function Contact() {
                       value={formData.subject}
                       onChange={handleChange}
                       placeholder="What's this about?"
-                      required
+                      className={errors.subject ? 'border-red-500' : ''}
+                      suppressHydrationWarning
                     />
+                    {errors.subject && (
+                      <p className="text-sm text-red-500 mt-1">{errors.subject}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -274,24 +324,31 @@ export default function Contact() {
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      placeholder="Tell us how we can help..."
+                      placeholder="Your message..."
                       rows={5}
-                      required
+                      className={errors.message ? 'border-red-500' : ''}
                     />
+                    {errors.message && (
+                      <p className="text-sm text-red-500 mt-1">{errors.message}</p>
+                    )}
                   </div>
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       type="submit"
+                      className="w-full md:w-auto bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 transition-all duration-300 transform hover:scale-[1.02]"
                       disabled={loading}
-                      className="w-full rounded-full bg-gradient-to-r from-primary to-blue-600 text-white py-3 text-lg flex items-center justify-center gap-2"
+                      suppressHydrationWarning
                     >
                       {loading ? (
-                        <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending...
+                        </>
                       ) : (
                         <>
                           Send Message
-                          <ArrowRight className="h-5 w-5" />
+                          <Send className="ml-2 h-4 w-4" />
                         </>
                       )}
                     </Button>
